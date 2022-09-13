@@ -1,0 +1,105 @@
+---
+title: "Random Forest for Predicting FRAP Assay Results from Oxidative Stress Genes - 50/50 split "
+author: "Imogen Stafford"
+date: "15/10/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Load Packages from Library 
+
+```{r}
+library(caret)
+library(tidyverse)
+library(randomForest)
+library(gbm)
+```
+
+
+#Load up and Configure Data
+
+```{r}
+rosdata <- read.delim("//filestore.soton.ac.uk/users/iss1g18/mydocuments/PhD/ROS Analysis/Data Files/rosdatanew.txt")
+
+MyVars <- c( "frap_avg_z","NOX1", "CYBA", "CYBB", "NCF2","NCF4",  "RAC2",
+             "DUOX2", "NOXA1","NOXO1", "DUOXA1", "DUOXA2", "DUOX1", "NOX3", "NOX4", "NOX5")
+
+mldata <- na.omit(rosdata[MyVars])
+```
+
+#Label FRAP assay results as "high", "mid", "low". Make a new column in the dataframe for this information.
+
+```{r}
+mldata$frap_bin <- mldata$frap_avg_z
+mldata$frap_bin[mldata$frap_avg_z > quantile(mldata$frap_avg_z, probs = 0.50)] <- print("high")
+mldata$frap_bin[mldata$frap_avg_z <= quantile(mldata$frap_avg_z, probs = 0.50)] <- print("low")
+mldata$frap_bin <- as.factor(mldata$frap_bin)
+
+#Check categories are in their correct proportion
+summary(mldata$frap_bin)
+
+#Remove frap z-scores
+mldata <- mldata[,-1]
+
+#Remove data in "mid" category
+data <- subset(mldata, frap_bin=="high" | frap_bin=="low")
+
+#remove mid level
+data$frap_bin <- factor(data$frap_bin)
+summary(data$frap_bin)
+
+```
+
+#FRAP model: remove midpoindata splitting
+
+```{r}
+#begin data partition
+set.seed(23)
+trainIndex <- createDataPartition(data$frap_bin, p = .65, 
+                                  list = FALSE, 
+                                  times = 1)
+head(trainIndex)
+
+frapTrain <- data[ trainIndex,]
+frapTest  <- data[-trainIndex,]
+summary(frapTrain$frap_bin)
+summary(frapTest$frap_bin)
+
+```
+
+#Random Forest Model Training
+
+```{r}
+set.seed(23)
+#method="rf"
+fitControl <- trainControl (##10-fold CV
+  method = "repeatedcv",
+  number=10,
+  repeats=10)
+
+Mtry <- sqrt(ncol(frapTrain))
+set.seed(23)
+rfFit <- train(frap_bin ~ ., data = frapTrain, method ="rf", metric="Accuracy",Mtry=6, trControl = fitControl )
+plot(rfFit)
+
+summary(rfFit)
+
+#method="gbm"
+set.seed(23)
+gbmGrid <-  expand.grid(interaction.depth = c(1, 5, 9), 
+                        n.trees = (1:30)*50, 
+                        shrinkage = 0.1,
+                        n.minobsinnode = 20)
+
+gbmFit2 <- train(frap_bin ~ ., data = frapTrain, 
+                 method = "gbm", 
+                 trControl = fitControl, 
+                 verbose = FALSE, 
+                 ## Now specify the exact models 
+                 ## to evaluate:
+                 tuneGrid = gbmGrid)
+plot(gbmFit2)
+```

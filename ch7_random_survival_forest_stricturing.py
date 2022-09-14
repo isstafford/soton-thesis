@@ -418,15 +418,6 @@ X_50 = X_50[:,fsel_ind]
 print(len(sel_ge_50))
 #######################################
 
-
-#feature_order_df = pd.DataFrame.from_items(zip(series.index, series.str.split('\t'))).T
-
-#feature_order.to_txt("C:/Users/iss1g18/OneDrive - University of Southampton/Documents/ML_IBD_2021/rsf/feature_ranking_all_data.txt", index = False)
-
-#X_train.astype(bool).sum(axis=0)
-
-
-
 pipe = Pipeline([
                  ('select', SelectKBest(fit_and_score_features, k=3)),
                  ('model', CoxPHSurvivalAnalysis())])
@@ -701,9 +692,9 @@ perm = PermutationImportance(rsf, n_iter=15, random_state=42)
 perm.fit(X_test, y_test)
 importances=eli5.show_weights(perm, feature_names=sel_ge, top=howmany)
 #importances=eli5.show_weights(perm, feature_names=featnames, top=many)
-with open('C:/Users/iss1g18/OneDrive - University of Southampton/Documents/ML_IBD_2021/rsf/nodsig_test_feat.htm','wb') as f:   # Use some reasonable temp name
+with open('../feature_importance.htm','wb') as f:   # Use some reasonable temp name
     f.write(importances.data.encode("UTF-8"))
 
 # open an HTML file on my own (Windows) computer
-url = r'C:/Users/iss1g18/OneDrive - University of Southampton/Documents/ML_IBD_2021/rsf/nodsig_test_feat.htm'
+url = r'../feature_importanct.htm'
 webbrowser.open(url,new=2)

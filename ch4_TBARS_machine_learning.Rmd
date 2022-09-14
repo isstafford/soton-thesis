@@ -25,7 +25,7 @@ library(RWeka)
 #Load up and Configure Data
 
 ```{r}
-rosdata <- read.delim("//filestore.soton.ac.uk/users/iss1g18/mydocuments/PhD/ROS Analysis/Data Files/rosdatanew.txt")
+rosdata <- read.delim("../rosdatanew.txt")
 
 MyVars <- c( "tbars_final_z","NOX1", "CYBA", "CYBB", "NCF2","NCF4",  "RAC2",
              "DUOX2", "NOXA1","NOXO1", "DUOXA1", "DUOXA2", "DUOX1", "NOX3", "NOX4", "NOX5")

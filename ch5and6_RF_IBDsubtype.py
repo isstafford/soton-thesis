@@ -539,7 +539,7 @@ for n in ordered_feature_names[:]:
     except:
         egg.append([n,1,dd[n]])
 egg= np.array(egg)  
-np.savetxt("C:/Users/iss1g18/OneDrive - University of Southampton/Documents/Final Thesis/CHAPTER 5 ML SUBTYPE ENDOTYPE CLASSIFIERS/CD-UC-AIPANEL_PHRED_FUENTES.txt",egg,fmt="%s")
+np.savetxt("../output_genes.txt",egg,fmt="%s")
 
 #%% violin
 df1 = g[ordered_feature_names[:10]][g['group']==g1].assign(Group=g1)
@@ -559,6 +559,6 @@ def multipage(filename, figs=None, dpi=200):
     for fig in figs:
         fig.savefig(pp, format='pdf')
     pp.close()
-multipage("C:/Users/iss1g18/OneDrive - University of Southampton/Documents/Final Thesis/CHAPTER 5 ML SUBTYPE ENDOTYPE CLASSIFIERS/CD-UC-AIPANEL_PHRED_FUENTES.pdf")
+multipage("../output_figs.pdf")
 
 
